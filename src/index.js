@@ -8,22 +8,30 @@ function sayHello() {
 }
 
 
-const List = (props) => {
-  return props.list.map(item => (<div key={item.objectID}>
-    <li>{item.title}</li>
-    <li>{item.url}</li>
-    <li>{item.author}</li>
-  </div>)
+const List = ({ list }) => {
+  return list.map(item => <Item {...item} key={item.objectID} />
   )
 }
 
-const Search = (props) => (
+const Item = ({ url, title, num_comments, author }) => {
+  return (
+    <div>
+      <ul>
+        <li><a href={url}>{title}</a></li>
+        <li>{num_comments}</li>
+        <li>{author}</li>
+      </ul>
+    </div>
+  )
+}
+
+const Search = ({ onSearch, itemSearch }) => (
   <div>
     <label htmlFor="search">Search: </label>
-    <input id="search" type="text" onChange={props.onSearch} />
+    <input id="search" type="text" onChange={onSearch} value={itemSearch} />
 
     <p>
-      Searching for <strong>{props.itemSearch}</strong>
+      Searching for <strong>{itemSearch}</strong>
     </p>
   </div>
 )
@@ -48,7 +56,7 @@ const App = () => {
     },
   ]
   const title = 'React';
-  const [itemSearch, setItemSearch] = React.useState('')
+  const [itemSearch, setItemSearch] = React.useState('redux')
   const onSearch = (event) => {
     setItemSearch(event.target.value)
   }
