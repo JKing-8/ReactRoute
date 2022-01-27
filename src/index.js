@@ -9,7 +9,7 @@ function sayHello() {
 
 
 const List = ({ list }) => {
-  return list.map(item => <Item {...item} key={item.objectID} />
+  return list.map(({ objectID, ...item }) => <Item {...item} key={objectID} />
   )
 }
 
@@ -56,11 +56,12 @@ const App = () => {
     },
   ]
   const title = 'React';
-  const [itemSearch, setItemSearch] = React.useState('redux')
+  const [itemSearch, setItemSearch] = React.useState(localStorage.getItem('search') || 'redux')
   const onSearch = (event) => {
     setItemSearch(event.target.value)
-  }
-  const searchedStories = stories.filter(story => story.title.toLowerCase().includes(itemSearch.toLowerCase()))
+  };
+  React.useEffect(() => { localStorage.setItem('search', itemSearch) }, [itemSearch])
+  const searchedStories = stories.filter(story => story.title.toLowerCase().includes(itemSearch.toLowerCase()));
   return (<div>
     {sayHello()}
     <br />
