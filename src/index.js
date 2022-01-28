@@ -25,16 +25,31 @@ const Item = ({ url, title, num_comments, author }) => {
   )
 }
 
-const Search = ({ onSearch, itemSearch }) => (
-  <div>
-    <label htmlFor="search">Search: </label>
-    <input id="search" type="text" onChange={onSearch} value={itemSearch} />
+const InputWithLabel = ({ id, value, type = 'text', children, onInputChange, isFocused }) => {
+  const inputRef = React.useRef();
+  React.useEffect(() => {
+    if (isFocused && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isFocused])
 
-    <p>
-      Searching for <strong>{itemSearch}</strong>
-    </p>
-  </div>
-)
+  return (
+    <div>
+      <label htmlFor="search">{children}: </label>
+      <input id={id} type={type} onChange={onInputChange} value={value} autoFocus={isFocused} ref={inputRef} />
+
+      <p>
+        Searching for <strong>{value}</strong>
+      </p>
+    </div>
+  )
+}
+
+const useSemiPersistentState = (key, initialState) => {
+  const [value, setValue] = React.useState(localStorage.getItem(key) || initialState)
+  React.useEffect(() => { localStorage.setItem(key, value) }, [key, value])
+  return [value, setValue]
+}
 
 const App = () => {
   const stories = [
@@ -55,23 +70,25 @@ const App = () => {
       objectID: 1,
     },
   ]
+  const [itemSearch, setItemSearch] = useSemiPersistentState('search', 'route')
   const title = 'React';
-  const [itemSearch, setItemSearch] = React.useState(localStorage.getItem('search') || 'redux')
   const onSearch = (event) => {
     setItemSearch(event.target.value)
   };
-  React.useEffect(() => { localStorage.setItem('search', itemSearch) }, [itemSearch])
   const searchedStories = stories.filter(story => story.title.toLowerCase().includes(itemSearch.toLowerCase()));
+
   return (<div>
     {sayHello()}
     <br />
     {title}
     <br />
 
-    <Search onSearch={onSearch} itemSearch={itemSearch} />
+    <InputWithLabel label='password' id='search' type='password' onInputChange={onSearch} value={itemSearch} isFocused='true'>
+      <strong>Reach Text</strong>
+    </InputWithLabel>
     <hr />
     <List list={searchedStories} />
-  </div>)
+  </div >)
 
 }
 
