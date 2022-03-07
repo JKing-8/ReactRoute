@@ -8,25 +8,29 @@ function sayHello() {
 }
 
 
-const List = ({ list }) => {
-  return list.map(({ objectID, ...item }) => <Item {...item} key={objectID} />
+const List = ({ list, onRemoveIterm}) => {
+  return list.map(({ objectID, ...item }) => <Item item={item}  key={objectID} onRemoveItem={onRemoveIterm} />
   )
 }
 
-const Item = ({ url, title, num_comments, author }) => {
+const Item = ({ item,onRemoveItem }) => {
+
   return (
     <div>
       <ul>
-        <li><a href={url}>{title}</a></li>
-        <li>{num_comments}</li>
-        <li>{author}</li>
+        <li><a href={item.url}>{item.title}</a></li>
+        <li>{item.num_comments}</li>
+        <li>{item.author}</li>
+        <button type="button" onClick={() => onRemoveItem(item)}>
+          Dismiss
+        </button>
       </ul>
     </div>
   )
 }
 
 const InputWithLabel = ({ id, value, type = 'text', children, onInputChange, isFocused }) => {
-  const inputRef = React.useRef();
+  const inputRef = React.useRef();  /*A . */
   React.useEffect(() => {
     if (isFocused && inputRef.current) {
       inputRef.current.focus();
@@ -51,10 +55,9 @@ const useSemiPersistentState = (key, initialState) => {
   return [value, setValue]
 }
 
-const App = () => {
-  const stories = [
+const initalStories = [
     {
-      title: 'route',
+      title: 'React',
       url: 'https://react.js',
       author: 'Jordan Walke',
       num_comments: 3,
@@ -69,13 +72,23 @@ const App = () => {
       points: 5,
       objectID: 1,
     },
-  ]
-  const [itemSearch, setItemSearch] = useSemiPersistentState('search', 'route')
+]
+  
+const App = () => {
+  const [itemSearch, setItemSearch] = useSemiPersistentState('react','redux');
+  const [stories, setStories] = React.useState(initalStories);
+  const handlerRemoveStories = item => {
+    const newStories = stories.filter(
+        story => item.objectID !== story.objectID
+    );
+    setStories(newStories);
+    console.log(newStories)
+  };
   const title = 'React';
   const onSearch = (event) => {
     setItemSearch(event.target.value)
   };
-  const searchedStories = stories.filter(story => story.title.toLowerCase().includes(itemSearch.toLowerCase()));
+  const searchedStories = initalStories.filter(story => story.title.toLowerCase().includes(itemSearch.toLowerCase()));
 
   return (<div>
     {sayHello()}
@@ -83,11 +96,11 @@ const App = () => {
     {title}
     <br />
 
-    <InputWithLabel label='password' id='search' type='password' onInputChange={onSearch} value={itemSearch} isFocused='true'>
+    <InputWithLabel label='password' id='search' type='text' onInputChange={onSearch} value={itemSearch} isFocused={true}>
       <strong>Reach Text</strong>
     </InputWithLabel>
     <hr />
-    <List list={searchedStories} />
+    <List list={searchedStories} onRemoveIterm={handlerRemoveStories}/>
   </div >)
 
 }
