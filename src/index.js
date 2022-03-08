@@ -8,20 +8,20 @@ function sayHello() {
 }
 
 
-const List = ({ list, onRemoveIterm}) => {
-  return list.map(({ objectID, ...item }) => <Item item={item}  key={objectID} onRemoveItem={onRemoveIterm} />
+const List = ({ list, onRemoveItem }) => {
+  return list.map(({ objectID, ...item }) => <Item item={item} key={objectID} onRemoveItem={onRemoveItem} />
   )
 }
 
-const Item = ({ item,onRemoveItem }) => {
-
+const Item = ({ item, onRemoveItem }) => {
+  const handlerRemoveStories = () => { onRemoveItem(item) }
   return (
     <div>
       <ul>
         <li><a href={item.url}>{item.title}</a></li>
         <li>{item.num_comments}</li>
         <li>{item.author}</li>
-        <button type="button" onClick={() => onRemoveItem(item)}>
+        <button type="button" onClick={handlerRemoveStories}>
           Dismiss
         </button>
       </ul>
@@ -55,31 +55,33 @@ const useSemiPersistentState = (key, initialState) => {
   return [value, setValue]
 }
 
+
 const initalStories = [
-    {
-      title: 'React',
-      url: 'https://react.js',
-      author: 'Jordan Walke',
-      num_comments: 3,
-      points: 4,
-      objectID: 0,
-    },
-    {
-      title: 'Redux',
-      url: 'https://redux.js.org/',
-      author: 'Dan Abramov, Andrew Clark',
-      num_comments: 2,
-      points: 5,
-      objectID: 1,
-    },
+  {
+    title: 'React',
+    url: 'https://react.js',
+    author: 'Jordan Walke',
+    num_comments: 3,
+    points: 4,
+    objectID: 0,
+  },
+  {
+    title: 'Redux',
+    url: 'https://redux.js.org/',
+    author: 'Dan Abramov, Andrew Clark',
+    num_comments: 2,
+    points: 5,
+    objectID: 1,
+  },
 ]
-  
+
+
 const App = () => {
-  const [itemSearch, setItemSearch] = useSemiPersistentState('react','redux');
+  const [itemSearch, setItemSearch] = useSemiPersistentState('react', 'react');
   const [stories, setStories] = React.useState(initalStories);
   const handlerRemoveStories = item => {
     const newStories = stories.filter(
-        story => item.objectID !== story.objectID
+      story => item.objectID !== story.objectID
     );
     setStories(newStories);
     console.log(newStories)
@@ -100,7 +102,7 @@ const App = () => {
       <strong>Reach Text</strong>
     </InputWithLabel>
     <hr />
-    <List list={searchedStories} onRemoveIterm={handlerRemoveStories}/>
+    <List list={searchedStories} onRemoveItem={handlerRemoveStories} />
   </div >)
 
 }
